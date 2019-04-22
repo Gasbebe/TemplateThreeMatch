@@ -12,8 +12,13 @@ public class Board : MonoBehaviour
     public GameObject tilePrefab;
     public GameObject[] gamePiecePrefabs;
 
+    public float swapTime = 0.5f; 
+
     Tile[,] m_allTiles;
-    GameObject[,] m_allGamePieces;
+    GamePiece[,] m_allGamePieces;
+
+    Tile m_clickedTile;
+    Tile m_targetTile;
 
     void SetupTiles()
     {
@@ -62,7 +67,18 @@ public class Board : MonoBehaviour
         }
         gamePiece.transform.position = new Vector3(x, y, 0);
         gamePiece.transform.rotation = Quaternion.identity;
+
+        if (IsWithinBounds(x, y))
+        {
+            m_allGamePieces[x, y] = gamePiece;
+        }
+
         gamePiece.SetCoord(x, y);
+    }
+
+    bool IsWithinBounds(int x, int y)
+    {
+        return (x >= 0 && x < width && y >= 0 && y < height);
     }
 
     void FillRandom()
@@ -75,16 +91,53 @@ public class Board : MonoBehaviour
 
                 if(randomPiece != null)
                 {
+                    randomPiece.GetComponent<GamePiece>().Init(this);
                     PlaceGamePiece(randomPiece.GetComponent<GamePiece>(), i, j);
                 }
             }
         }
     }
+
+    public void ClickTile(Tile tile)
+    {
+        if(m_clickedTile == null)
+        {
+            m_clickedTile = tile;
+        }
+    }
+
+    public void DragToTile(Tile tile)
+    {
+        if(m_clickedTile != null)
+        {
+            m_targetTile = tile;
+        }
+    }
+
+    public void ReleaseTile()
+    {
+        if(m_clickedTile != null && m_targetTile != null)
+        {
+            SwtichTile(m_clickedTile, m_targetTile);
+        }
+    }
+
+    void SwtichTile(Tile clikedTile, Tile targetTile)
+    {
+        GamePiece clickedPiece = m_allGamePieces[clikedTile.xIndex, clikedTile.yIndex];
+        GamePiece targetPiece = m_allGamePieces[targetTile.xIndex, targetTile.yIndex];
+
+        clickedPiece.Move(targetTile.xIndex, targetTile.yIndex, swapTime);
+        targetPiece.Move(clickedPiece.xIndex, clickedPiece.yIndex, swapTime);
+
+        m_clickedTile = null;
+        m_targetTile = null;
+    }
  
     void Start()
     {
         m_allTiles = new Tile[width, height];
-        m_allGamePieces = new GameObject[width, height];
+        m_allGamePieces = new GamePiece[width, height];
         SetupTiles();
         SetupCamera();
         FillRandom();

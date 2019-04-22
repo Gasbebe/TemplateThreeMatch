@@ -9,6 +9,32 @@ public class Tile : MonoBehaviour
 
     Board m_board;
 
+    #region MouseAction
+    private void OnMouseEnter()
+    {
+        if (m_board != null)
+        {
+            m_board.DragToTile(this);
+        }
+    }
+
+    private void OnMouseDown()
+    {
+        if (m_board != null)
+        {
+            m_board.ClickTile(this);
+        }
+    }
+
+    private void OnMouseUp()
+    {
+        if (m_board != null)
+        {
+            m_board.ReleaseTile();
+        }
+    }
+    #endregion
+
     void Start()
     {
         

@@ -7,14 +7,23 @@ public class GamePiece : MonoBehaviour
     public int xIndex;
     public int yIndex;
 
+    Board m_board;
+
     bool m_isMoving = false;
     private void Update()
     {
-
+        /*
         if (Input.anyKeyDown)
         {
             Move((int)transform.position.x + 1, (int)transform.position.y, 0.5f);
         }
+        */
+
+    }
+
+    public void Init(Board board)
+    {
+        m_board = board;
     }
 
     public void SetCoord(int x, int y)
