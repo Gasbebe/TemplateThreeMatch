@@ -9,6 +9,17 @@ public class GamePiece : MonoBehaviour
 
     Board m_board;
     bool m_isMoving = false;
+    
+    public enum MatchValue
+    {
+        RED,
+        BLUE,
+        GREEN,
+        INDIGO,
+        CYAN,
+        YELLOW
+    }
+    public MatchValue matchValue;
 
     private void Update()
     {
