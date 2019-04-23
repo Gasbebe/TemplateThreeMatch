@@ -8,8 +8,8 @@ public class GamePiece : MonoBehaviour
     public int yIndex;
 
     Board m_board;
-
     bool m_isMoving = false;
+
     private void Update()
     {
         /*
@@ -42,14 +42,18 @@ public class GamePiece : MonoBehaviour
 
         bool reachedDestination = false;
         float elapsedTime = 0f;
+
         m_isMoving = true;
+
         while (!reachedDestination)
         {
             if(Vector3.Distance(transform.position, destination) < 0.01f)
             {
                 reachedDestination = true;
-                transform.position = destination;
-                SetCoord((int)destination.x, (int)destination.y);
+                if(m_board != null)
+                {
+                    m_board.PlaceGamePiece(this, (int)destination.x, (int)destination.y);
+                }
             }
             elapsedTime += Time.deltaTime;
 
@@ -62,7 +66,7 @@ public class GamePiece : MonoBehaviour
 
             yield return null;
         }
+
         m_isMoving = false;
     }
-
 }

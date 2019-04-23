@@ -44,8 +44,7 @@ public class Board : MonoBehaviour
 
         Camera.main.orthographicSize = (verticalSize > horziontalSize) ? verticalSize : horziontalSize;
     }
-
-    
+  
     GameObject GetRandomGamePicece()
     {
         int randomIdx = Random.Range(0, gamePiecePrefabs.Length);
@@ -58,7 +57,7 @@ public class Board : MonoBehaviour
         return gamePiecePrefabs[randomIdx];
     }
 
-    void PlaceGamePiece(GamePiece gamePiece, int x, int y)
+    public void PlaceGamePiece(GamePiece gamePiece, int x, int y)
     {
         if(gamePiece == null)
         {
@@ -72,7 +71,6 @@ public class Board : MonoBehaviour
         {
             m_allGamePieces[x, y] = gamePiece;
         }
-
         gamePiece.SetCoord(x, y);
     }
 
@@ -93,6 +91,7 @@ public class Board : MonoBehaviour
                 {
                     randomPiece.GetComponent<GamePiece>().Init(this);
                     PlaceGamePiece(randomPiece.GetComponent<GamePiece>(), i, j);
+                    randomPiece.transform.parent = transform;
                 }
             }
         }
@@ -108,7 +107,7 @@ public class Board : MonoBehaviour
 
     public void DragToTile(Tile tile)
     {
-        if(m_clickedTile != null)
+        if(m_clickedTile != null && isNextTo(tile, m_clickedTile))
         {
             m_targetTile = tile;
         }
@@ -133,7 +132,18 @@ public class Board : MonoBehaviour
         m_clickedTile = null;
         m_targetTile = null;
     }
- 
+    bool isNextTo(Tile start, Tile end)
+    {
+        if(Mathf.Abs(start.xIndex - end.xIndex) == 1 && start.yIndex == end.yIndex)
+        {
+            return true;
+        }
+        if (Mathf.Abs(start.yIndex - end.yIndex) == 1 && start.xIndex == end.xIndex)
+        {
+            return true;
+        }
+        return false;
+    }
     void Start()
     {
         m_allTiles = new Tile[width, height];
@@ -147,4 +157,5 @@ public class Board : MonoBehaviour
     {
 
     }
+
 }
