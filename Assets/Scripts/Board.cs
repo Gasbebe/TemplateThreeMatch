@@ -198,6 +198,8 @@ public class Board : MonoBehaviour
 
         return null;
     }
+
+    //상하로 같은 색상 검색후 2개의 리스트를 합쳐 3이상이면 리스트 반환
     List<GamePiece> FindVerticalMatches(int startX, int startY, int minLength = 3)
     {
         List<GamePiece> upwardMatches = FindMatches(startX, startY, new Vector2(0, 1), 2);
@@ -212,14 +214,6 @@ public class Board : MonoBehaviour
         {
             downwardMatches = new List<GamePiece>();
         }
-        //foreach(GamePiece piece in downwardMatches)
-        //{
-        //    if (!upwardMatches.Contains(piece))
-        //    {
-        //        upwardMatches.Add(piece);
-        //    }
-        //}
-        //return (upwardMatches.Count >= minLength) ? upwardMatches : null;
 
         var combinedMatches = upwardMatches.Union(downwardMatches).ToList();
 
@@ -227,6 +221,7 @@ public class Board : MonoBehaviour
 
     }
 
+    //좌우로 같은 색상 검색후 2개의 리스트를 합쳐 3이상이면 리스트 반환
     List<GamePiece> FindHorizontalMatches(int startX, int startY, int minLength = 3)
     {
         List<GamePiece> rightMatches = FindMatches(startX, startY, new Vector2(1, 0), 2);
@@ -241,19 +236,22 @@ public class Board : MonoBehaviour
         {
             leftMatches = new List<GamePiece>();
         }
-        //foreach(GamePiece piece in downwardMatches)
-        //{
-        //    if (!upwardMatches.Contains(piece))
-        //    {
-        //        upwardMatches.Add(piece);
-        //    }
-        //}
-        //return (upwardMatches.Count >= minLength) ? upwardMatches : null;
 
         var combinedMatches = rightMatches.Union(leftMatches).ToList();
 
         return (combinedMatches.Count >= minLength) ? combinedMatches : null;
 
+    }
+    void HighLightTileOff(int x, int y)
+    {
+        SpriteRenderer spriteRenderer = m_allTiles[x, y].GetComponent<SpriteRenderer>();
+        spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 0);
+    }
+
+    void HighLightTileOn(int x, int y, Color color)
+    {
+        SpriteRenderer spriteRenderer = m_allTiles[x, y].GetComponent<SpriteRenderer>();
+        spriteRenderer.color = color;
     }
 
     void HighLightMatches()
@@ -262,35 +260,39 @@ public class Board : MonoBehaviour
         {
             for(int j =0; j<height; j++)
             {
-                SpriteRenderer spriteRenderer = m_allTiles[i, j].GetComponent<SpriteRenderer>();
-                spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 0);
+                HighLightTileOff(i, j);
 
-                List<GamePiece> horizMatches = FindHorizontalMatches(i, j, 3);
-                List<GamePiece> verticalMatches = FindVerticalMatches(i, j, 3);
+                List<GamePiece> combineMatches = FindAllMathchesAt(i, j);
 
-
-                if(horizMatches == null)
+                if (combineMatches.Count > 0)
                 {
-                    horizMatches = new List<GamePiece>();
-                }
-
-                if(verticalMatches == null)
-                {
-                    verticalMatches = new List<GamePiece>();
-                }
-
-                var combineMatches = horizMatches.Union(verticalMatches).ToList();
-
-                if(combineMatches.Count > 0)
-                {
-                    foreach(GamePiece piece in combineMatches)
+                    foreach (GamePiece piece in combineMatches)
                     {
-                        spriteRenderer = m_allTiles[piece.xIndex, piece.yIndex].GetComponent<SpriteRenderer>();
-                        spriteRenderer.color = piece.GetComponent<SpriteRenderer>().color;
+                        HighLightTileOn(piece.xIndex, piece.yIndex, piece.GetComponent<SpriteRenderer>().color);
                     }
                 }
             }
         }
+    }
+
+    private List<GamePiece> FindAllMathchesAt(int i, int j, int minLenght = 3)
+    {
+        List<GamePiece> horizMatches = FindHorizontalMatches(i, j, minLenght);
+        List<GamePiece> verticalMatches = FindVerticalMatches(i, j, minLenght);
+
+
+        if (horizMatches == null)
+        {
+            horizMatches = new List<GamePiece>();
+        }
+
+        if (verticalMatches == null)
+        {
+            verticalMatches = new List<GamePiece>();
+        }
+
+        var combineMatches = horizMatches.Union(verticalMatches).ToList();
+        return combineMatches;
     }
     #endregion
 
